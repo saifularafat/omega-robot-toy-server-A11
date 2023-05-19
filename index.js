@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 //middleware
@@ -29,12 +29,50 @@ async function run() {
 
         const robotCollection = client.db('kidsRobot').collection('robotProducts')
 
+        //data read rout
         app.get('/robotProducts', async(req, res) => {
             const cursor = robotCollection.find();
             const result = await cursor.toArray();
             res.send(result)
-
         })
+
+        // one items read
+        app.get('/robotProducts/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const result = await robotCollection.findOne(query);
+            res.send(result)
+        })
+
+        /* new item add rout  */
+        app.post('/robotProducts', async(req, res) => {
+            const newRobot = req.body;
+            console.log('new robot router',newRobot);
+            const result = await robotCollection.insertOne(newRobot);
+            res.send(result)
+        })
+  
+       
+
+        //unique 
+
+        //simple
+        app.get('/carRobot', async(req, res) => {
+            console.log(req.query);
+            const query = {category_name:'Car Robot'}
+            const cursor = robotCollection.find(query);
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+
+        // one items delete read 
+        app.delete('/robotProducts/:id', async(req, res ) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const result = await robotCollection.deleteOne(query);
+            res.send(result)
+        })
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Kids Omega Robot Server You successfully connected to MongoDB!");
