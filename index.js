@@ -80,7 +80,18 @@ async function run() {
             const result = await cursor.toArray()
             res.send(result)
         })
-        
+        app.get('/electricRobot', async (req, res) => {
+            const query = { category_name: 'Electric Robot' }
+            const cursor = robotCollection.find(query);
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+        app.get('/flyingRobot', async (req, res) => {
+            const query = { category_name: 'Flying Robot' }
+            const cursor = robotCollection.find(query);
+            const result = await cursor.toArray()
+            res.send(result)
+        })
 
         // one items delete read 
         app.delete('/robotProducts/:id', async (req, res) => {
