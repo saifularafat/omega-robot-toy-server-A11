@@ -31,9 +31,17 @@ async function run() {
 
         //data read rout
         app.get('/robotProducts', async (req, res) => {
-            const cursor = robotCollection.find();
-            const result = await cursor.toArray();
-            res.send(result)
+            // const cursor = robotCollection.find();
+            // const result = await cursor.toArray();
+            // res.send(result)
+             
+            let query = {};
+            if(req.query?.email){
+                query = { email: req.query.email };
+            }
+            const result = await robotCollection.find(query).toArray();
+            res.send(result) 
+        
         })
 
         // one items read
@@ -53,7 +61,7 @@ async function run() {
         })
 
         // one items update the all products
-        app.purge('/robotProducts/:id', async (req, res) => {
+        app.patch('/robotProducts/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
             const option = { upsert: true };
@@ -70,7 +78,6 @@ async function run() {
             const result = await robotCollection.updateOne(filter, updateDoc, option)
             res.send(result)
         })
-
 
         //sub category rout read
         app.get('/carRobot', async (req, res) => {
