@@ -71,16 +71,16 @@ async function run() {
             res.send(result)
         })
 
-        //unique 
 
-        //simple
+        //sub category rout read
         app.get('/carRobot', async (req, res) => {
-            console.log(req.query);
+            console.log('serial number 77', req.query);
             const query = { category_name: 'Car Robot' }
             const cursor = robotCollection.find(query);
             const result = await cursor.toArray()
             res.send(result)
         })
+        
 
         // one items delete read 
         app.delete('/robotProducts/:id', async (req, res) => {
