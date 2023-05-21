@@ -29,14 +29,6 @@ async function run() {
 
         const robotCollection = client.db('kidsRobot').collection('robotProducts')
 
-        // creating index on the three field
-        const indexKeys = { sellerName:1, name:1, category_name:1 };
-        
-        const indexOptions = { name : "searchField"}
-
-        /* mongodb search field create sub database */
-        const result = await robotCollection.createIndex(indexKeys, indexOptions)
-
         /* search field rout */
         app.get('/searchFieldRobot/:text', async(req, res) => {
             const searchText = req.params.text;
