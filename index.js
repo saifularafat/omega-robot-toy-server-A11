@@ -29,12 +29,29 @@ async function run() {
 
         const robotCollection = client.db('kidsRobot').collection('robotProducts')
 
+        // creating index on the three field
+        const indexKeys = { sellerName:1, name:1, category_name:1 };
+        
+        const indexOptions = { name : "searchField"}
+
+        /* mongodb search field create sub database */
+        const result = await robotCollection.createIndex(indexKeys, indexOptions)
+
+        /* search field rout */
+        app.get('/searchFieldRobot/:text', async(req, res) => {
+            const searchText = req.params.text;
+            const result = await robotCollection.find({
+                $or : [
+                    {sellerName : {$regex: searchText, $options: "i"}},
+                    {name : {$regex: searchText, $options: "i"}},
+                    {category_name : {$regex: searchText, $options: "i"}},
+                ]
+            }).toArray();
+            res.send(result)
+        })
+
         //data read rout
         app.get('/robotProducts', async (req, res) => {
-            // const cursor = robotCollection.find();
-            // const result = await cursor.toArray();
-            // res.send(result)
-             
             let query = {};
             if(req.query?.email){
                 query = { email: req.query.email };
