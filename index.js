@@ -69,6 +69,23 @@ async function run() {
             res.send(result)
         })
 
+        /* Ascending  Get*/
+        app.get('/ascendingPrice', async( req, res ) => {
+            const result = await robotCollection
+            .find()
+            .sort({ price: 1 })
+            .toArray()
+            res.send(result)
+        })
+        /* Descending  Get*/
+        app.get('/descendingPrice', async( req, res ) => {
+            const result = await robotCollection
+            .find()
+            .sort({ price: -1 })
+            .toArray()
+            res.send(result)
+        })
+
         /* new item add rout  */
         app.post('/robotProducts', async (req, res) => {
             const newRobot = req.body;
