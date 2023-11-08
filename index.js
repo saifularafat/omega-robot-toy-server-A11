@@ -28,15 +28,16 @@ async function run() {
         // await client.connect();
 
         const robotCollection = client.db('kidsRobot').collection('robotProducts')
-
+        const mainPostCollection = client.db("kidsRobot").collection("mainPost");
+        const commentCollection = client.db("kidsRobot").collection("postComments");
         /* search field rout */
-        app.get('/searchFieldRobot/:text', async(req, res) => {
+        app.get('/searchFieldRobot/:text', async (req, res) => {
             const searchText = req.params.text;
             const result = await robotCollection.find({
-                $or : [
-                    {sellerName : {$regex: searchText, $options: "i"}},
-                    {name : {$regex: searchText, $options: "i"}},
-                    {category_name : {$regex: searchText, $options: "i"}},
+                $or: [
+                    { sellerName: { $regex: searchText, $options: "i" } },
+                    { name: { $regex: searchText, $options: "i" } },
+                    { category_name: { $regex: searchText, $options: "i" } },
                 ]
             }).toArray();
             res.send(result)
@@ -45,14 +46,14 @@ async function run() {
         //data read rout
         app.get('/robotProducts', async (req, res) => {
             let query = {};
-            if(req.query?.email){
+            if (req.query?.email) {
                 query = { email: req.query.email };
             }
             const result = await robotCollection
-            .find(query)
-            .limit(20)
-            .toArray()
-            res.send(result) 
+                .find(query)
+                .limit(20)
+                .toArray()
+            res.send(result)
 
         })
 
@@ -65,19 +66,19 @@ async function run() {
         })
 
         /* Ascending  Get*/
-        app.get('/ascendingPrice', async( req, res ) => {
+        app.get('/ascendingPrice', async (req, res) => {
             const result = await robotCollection
-            .find()
-            .sort({ price: 1 })
-            .toArray()
+                .find()
+                .sort({ price: 1 })
+                .toArray()
             res.send(result)
         })
         /* Descending  Get*/
-        app.get('/descendingPrice', async( req, res ) => {
+        app.get('/descendingPrice', async (req, res) => {
             const result = await robotCollection
-            .find()
-            .sort({ price: -1 })
-            .toArray()
+                .find()
+                .sort({ price: -1 })
+                .toArray()
             res.send(result)
         })
 
@@ -136,6 +137,44 @@ async function run() {
             const result = await robotCollection.deleteOne(query);
             res.send(result)
         })
+
+        /* Comments section  */
+
+        app.post('/main_post', async (req, res) => {
+            const { content } = req.body;
+            try {
+                const result = await mainPostCollection.insertOne({
+                    content,
+                    userName,
+                    photoURL,
+                    createdAt: new Date()
+                });
+                
+                app.post('/post_comment', async (req, res) => {
+                    const { postId, content } = req.body;
+
+                    try {
+                        const result = await commentCollection.insertOne({
+                            postId: ObjectId(postId),
+                            content,
+                            createdAt: new Date()
+                        });
+
+                        res.json({ message: "Comment posted", insertedId: result.insertedId });
+                    } catch (error) {
+                        console.error('Error posting comment:', error);
+                        res.status(500).json({ message: "Error posting comment" });
+                    }
+                });
+                res.json({ message: "Article posted", insertedId: result.insertedId });
+            } catch (error) {
+                console.error('Error posting article:', error);
+                res.status(500).json({ message: "Error posting article" });
+            }
+        });
+
+
+
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
